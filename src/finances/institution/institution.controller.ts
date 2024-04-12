@@ -8,7 +8,7 @@ export class InstitutionController {
   constructor(private readonly institutionService: InstitutionService) {}
 
   @Post()
-  create(@Body() createInstitutionDto: CreateInstitutionDto) {
+  create(@Body('institution') createInstitutionDto: CreateInstitutionDto) {
     return this.institutionService.create(createInstitutionDto);
   }
 

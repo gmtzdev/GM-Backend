@@ -3,15 +3,30 @@ import { FinancesService } from './finances.service';
 
 @Controller('finances')
 export class FinancesController {
-  constructor(private readonly financesService: FinancesService) {}
+  constructor(private readonly financesService: FinancesService) { }
 
   @Get('getIncomesPer/:date')
-  getIncomesPer(@Param('date') date: string){
+  getIncomesPer(@Param('date') date: string) {
     return this.financesService.getIncomesPer(date);
   }
 
+  @Get('getBillsPer/:date')
+  async getBillsPer(@Param('date') date: string) {
+    return this.financesService.getBillsPer(date);
+  }
+
+  @Get('getBillsInFormat')
+  getBillsInFormat(){
+    return this.financesService.getBillsInFormat();
+  }
+
+  @Get('getTopOneCategory')
+  getTopOneCategory(){
+    return this.financesService.getTopOneCategory();
+  }
+
   @Get('getIncomesVsBills/:year')
-  async getIncomesVsBills(@Param('year', ParseIntPipe) year: number){
+  async getIncomesVsBills(@Param('year', ParseIntPipe) year: number) {
     return this.financesService.getIncomesVsBills(year);
   }
 
@@ -27,7 +42,7 @@ export class FinancesController {
 
 
 
-  
+
   // @Post()
   // create(@Body() createFinanceDto: CreateFinanceDto) {
   //   return this.financesService.create(createFinanceDto);

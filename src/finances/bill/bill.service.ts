@@ -15,10 +15,8 @@ export class BillService {
   ) { }
 
   async create(createBillDto: CreateBillDto) {
-    console.log(createBillDto)
     const newBill = this.billRepository.create(createBillDto);
     const bill = await this.billRepository.save(newBill);
-    console.log(bill)
     if(!(bill instanceof Bill)){
       // Error
     }
