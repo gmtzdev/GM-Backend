@@ -4,6 +4,7 @@ import { UpdateInstitutionDto } from './dto/update-institution.dto';
 import { Repository } from 'typeorm';
 import { Institution } from './entities/institution.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { HttpResponse } from 'src/shared/models/HttpResponse.model';
 
 @Injectable()
 export class InstitutionService {
@@ -13,9 +14,13 @@ export class InstitutionService {
     private institutionRepository: Repository<Institution>
   ) { }
 
-  create(createInstitutionDto: CreateInstitutionDto) {
+  async create(createInstitutionDto: CreateInstitutionDto) {
     const newInstitution = this.institutionRepository.create(createInstitutionDto);
-    return this.institutionRepository.save(newInstitution);
+    const institution = await this.institutionRepository.save(newInstitution);
+    if(!(institution instanceof Institution)){
+      // Error
+    }
+    return new HttpResponse(true, 'Bill created successfully', institution);
   }
 
   findAll() {

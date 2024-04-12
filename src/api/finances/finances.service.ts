@@ -1,4 +1,5 @@
 import * as moment from 'moment';
+import { from, pipe, groupBy, mergeMap, toArray } from 'rxjs';
 
 import { Injectable } from '@nestjs/common';
 
@@ -26,7 +27,6 @@ export class FinancesService {
     @InjectRepository(Bill, 'finance')
     private billRepository: Repository<Bill>
   ) { }
-
 
   async getIncomesPer(date: string) {
     try {
@@ -71,6 +71,98 @@ export class FinancesService {
       return new HttpResponse(true, 'Return incomes', { incomesPer })
     } catch (error) {
       return new HttpResponse(false, 'Error into getIncomesPer', { error: error.message }, 400)
+    }
+  }
+
+  async getBillsPer(date: string) {
+    try {
+
+      const firstDayOfYear = moment(date).startOf('year').format('YYYY-MM-DD HH:mm:ss.SSS');
+      const lastDayOfYear = moment(date).endOf('year').format('YYYY-MM-DD HH:mm:ss.SSS');
+
+      const firstDayOfMonth = moment(date).startOf('month').format('YYYY-MM-DD HH:mm:ss.SSS');
+      const lastDayOfMonth = moment(date).endOf('month').format('YYYY-MM-DD HH:mm:ss.SSS');
+
+      const firstHourOfDay = moment(date).startOf('day').format('YYYY-MM-DD HH:mm:ss.SSS');
+      const lastHourOfDay = moment(date).endOf('day').format('YYYY-MM-DD HH:mm:ss.SSS');
+
+      const billsPerYear = await this.billRepository.findBy({
+        created_at: Between(new Date(firstDayOfYear), new Date(lastDayOfYear))
+      });
+
+      const billsPerMonth = await this.billRepository.findBy({
+        created_at: Between(new Date(firstDayOfMonth), new Date(lastDayOfMonth))
+      });
+
+      const billsPerDay = await this.billRepository.findBy({
+        created_at: Between(new Date(firstHourOfDay), new Date(lastHourOfDay))
+      });
+
+      let amountPerYear: number = 0;
+      billsPerYear.forEach((bill) => {
+        amountPerYear += bill.amount;
+      });
+
+      let amountPerMonth: number = 0;
+      billsPerMonth.forEach((bill) => {
+        amountPerMonth += bill.amount;
+      });
+
+      let amountPerDay: number = 0;
+      billsPerDay.forEach((bill) => {
+        amountPerDay += bill.amount;
+      });
+
+      const billsPer = [amountPerYear, amountPerMonth, amountPerDay];
+      return new HttpResponse(true, 'Return bills', { billsPer })
+    } catch (error) {
+      return new HttpResponse(false, 'Error into getIncomesPer', { error: error.message }, 400)
+    }
+  }
+
+  async getBillsInFormat() {
+    try {
+      const bills = await this.billRepository.createQueryBuilder()
+        .select('created_at', 'name')
+        .addSelect('amount', 'value')
+        .execute();
+
+      const billsInFormat = {
+        name: 'Bills',
+        series: bills
+      }
+
+      return new HttpResponse(true, 'Bills find successfully!', { data: billsInFormat });
+    } catch (error) {
+      return new HttpResponse(false, 'Error into getBillsInFormat', { error: error.message }, 400);
+    }
+  }
+
+  async getTopOneCategory() {
+    try {
+      const bills = await this.billRepository.find({ relations: ['category'] });
+
+      const grouped = bills.reduce((previousValue: any, currentValue: any) => {
+        (previousValue[currentValue.category['name']] = previousValue[currentValue.category['name']] || []).push(currentValue);
+        return previousValue;
+      }, {});
+
+      let result = []
+      for (let key in grouped) {
+        let category = key;
+        let amount = 0;
+        for (let bill of grouped[category] as Bill[]) {
+          amount += bill.amount;
+        }
+        result.push({ category, amount });
+      }
+      
+      result.sort((a, b) => a.amount - b.amount);
+      
+
+      return new HttpResponse(true, 'Top One Category find successfully!', result.pop());
+    } catch (error) {
+      return new HttpResponse(false, error.message, { error: error.message }, 400);
     }
   }
 
