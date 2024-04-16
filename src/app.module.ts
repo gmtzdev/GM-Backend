@@ -18,14 +18,17 @@ import { Income } from './finances/income/entities/income.entity';
 import { Category } from './finances/category/entities/category.entity';
 import { Card } from './finances/card/entities/card.entity';
 import { Institution } from './finances/institution/entities/institution.entity';
+import { Objective } from './finances/objective/entities/objective.entity';
 import { Origin } from './finances/origin/entities/origin.entity';
 import { Payment } from './finances/payment/entities/payment.entity';
 
 import { BillModule } from './finances/bill/bill.module';
-import { IncomeModule } from './finances/income/income.module';
-import { CategoryModule } from './finances/category/category.module';
 import { CardModule } from './finances/card/card.module';
+import { CategoryModule } from './finances/category/category.module';
+import { ContributionModule } from './finances/contribution/contribution.module';
+import { IncomeModule } from './finances/income/income.module';
 import { InstitutionModule } from './finances/institution/institution.module';
+import { ObjectiveModule } from './finances/objective/objective.module';
 import { OriginModule } from './finances/origin/origin.module';
 import { PaymentModule } from './finances/payment/payment.module';
 
@@ -33,6 +36,7 @@ import { PaymentModule } from './finances/payment/payment.module';
 // API
 import { GeneralModule } from './api/general/general.module';
 import { FinancesModule } from './api/finances/finances.module';
+import { Contribution } from './finances/contribution/entities/contribution.entity';
 
 
 
@@ -61,10 +65,12 @@ import { FinancesModule } from './api/finances/finances.module';
       database: 'finance',
       entities: [
         Bill, 
-        Income, 
-        Category, 
         Card, 
+        Category, 
+        Contribution,
+        Income, 
         Institution, 
+        Objective,
         Origin, 
         Payment
       ],
@@ -77,10 +83,12 @@ import { FinancesModule } from './api/finances/finances.module';
 
     // Finances
     BillModule,
-    IncomeModule,
-    CategoryModule,
     CardModule,
+    CategoryModule,
+    ContributionModule,
+    IncomeModule,
     InstitutionModule,
+    ObjectiveModule,
     OriginModule,
     PaymentModule,
 
@@ -89,7 +97,6 @@ import { FinancesModule } from './api/finances/finances.module';
 
     // Finances
     FinancesModule,
-
   ],
   controllers: [AppController],
   providers: [AppService],
