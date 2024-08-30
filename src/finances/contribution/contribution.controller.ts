@@ -8,7 +8,7 @@ export class ContributionController {
   constructor(private readonly contributionService: ContributionService) {}
 
   @Post()
-  create(@Body() createContributionDto: CreateContributionDto) {
+  public create(@Body() createContributionDto: CreateContributionDto) {
     return this.contributionService.create(createContributionDto);
   }
 

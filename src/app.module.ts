@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { MoneyService } from './shared/services/money.service';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -9,8 +10,6 @@ import { NavItem } from './gmproject/nav-item/entities/nav-item.entity';
 import { User } from './gmproject/user/entities/user.entity';
 
 import { NavItemModule } from './gmproject/nav-item/nav-item.module';
-import { UserModule } from './gmproject/user/user.module';
-
 
 // Finances
 import { Bill } from './finances/bill/entities/bill.entity';
@@ -32,49 +31,68 @@ import { ObjectiveModule } from './finances/objective/objective.module';
 import { OriginModule } from './finances/origin/origin.module';
 import { PaymentModule } from './finances/payment/payment.module';
 
+// Productivity
+import { ListModule } from './productivity/list/list.module';
+import { TaskModule } from './productivity/task/task.module';
+import { CategoryTaskModule } from './productivity/category-task/category-task.module';
+
+import { List } from './productivity/list/entities/list.entity';
+import { Task } from './productivity/task/entities/task.entity';
+import { CategoryTask } from './productivity/category-task/entities/category-task.entity';
 
 // API
-import { GeneralModule } from './api/general/general.module';
+// import { GeneralModule } from './api/general/general.module';
 import { FinancesModule } from './api/finances/finances.module';
 import { Contribution } from './finances/contribution/entities/contribution.entity';
-
-
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'GMMtz1012',
-      database: 'gmproject',
-      entities: [
-        User, 
-        NavItem
-      ],
-      name: 'gmproject',
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE_ONE,
+      entities: [User, NavItem],
+      name: process.env.DB_DATABASE_ONE,
       synchronize: true,
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'GMMtz1012',
-      database: 'finance',
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE_TWO,
       entities: [
-        Bill, 
-        Card, 
-        Category, 
+        Bill,
+        Card,
+        Category,
         Contribution,
-        Income, 
-        Institution, 
+        Income,
+        Institution,
         Objective,
-        Origin, 
-        Payment
+        Origin,
+        Payment,
       ],
-      name: 'finance',
+      name: process.env.DB_DATABASE_TWO,
+      synchronize: true,
+    }),
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE_THREE,
+      entities: [Task, List, CategoryTask],
+      name: process.env.DB_DATABASE_THREE,
       synchronize: true,
     }),
 
@@ -97,8 +115,13 @@ import { Contribution } from './finances/contribution/entities/contribution.enti
 
     // Finances
     FinancesModule,
+
+    // Productivity
+    ListModule,
+    TaskModule,
+    CategoryTaskModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MoneyService],
 })
-export class AppModule { }
+export class AppModule {}

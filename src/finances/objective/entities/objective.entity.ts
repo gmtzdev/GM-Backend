@@ -15,7 +15,7 @@ export class Objective {
     @Column({ type: 'double' })
     amount: number;
 
-    @Column({ type: 'double' })
+    @Column({ type: 'double', default: 0 })
     percentage: number;
 
     @Column({ default: false })

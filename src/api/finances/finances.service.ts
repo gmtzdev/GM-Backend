@@ -1,7 +1,5 @@
 import * as moment from 'moment';
-import { from, pipe, groupBy, mergeMap, toArray } from 'rxjs';
-
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
@@ -9,47 +7,74 @@ import { Between, Repository } from 'typeorm';
 // Entity
 import { Income } from 'src/finances/income/entities/income.entity';
 import { Bill } from 'src/finances/bill/entities/bill.entity';
+import { Objective } from 'src/finances/objective/entities/objective.entity';
+import { Category } from 'src/finances/category/entities/category.entity';
 
 // Enum
 import { MonthOfYear } from 'src/shared/enums/MonthOfYear.enum';
+
+// Intefaces
+import { CategoryOptions } from 'src/shared/interfaces/categoryOptions';
 
 // Model
 import { IncomesVsBill } from 'src/shared/models/IncomesVsBill.model';
 import { InformationOfGraphic } from 'src/shared/models/InformationOfGraphic.model';
 import { HttpResponse } from 'src/shared/models/HttpResponse.model';
 
+// Services
+import { MoneyService } from 'src/shared/services/money.service';
+import { CategoryGraphic } from 'src/shared/models/categoryGraphic';
+
 @Injectable()
 export class FinancesService {
-
   constructor(
     @InjectRepository(Income, 'finance')
     private incomeRepository: Repository<Income>,
     @InjectRepository(Bill, 'finance')
-    private billRepository: Repository<Bill>
-  ) { }
+    private billRepository: Repository<Bill>,
+    @InjectRepository(Objective, 'finance')
+    private objectiveRepository: Repository<Objective>,
+    @InjectRepository(Category, 'finance')
+    private categoryRepository: Repository<Category>,
+    private moneyService: MoneyService,
+  ) {}
 
   async getIncomesPer(date: string) {
     try {
+      const firstDayOfYear = moment(date)
+        .startOf('year')
+        .format('YYYY-MM-DD HH:mm:ss.SSS');
+      const lastDayOfYear = moment(date)
+        .endOf('year')
+        .format('YYYY-MM-DD HH:mm:ss.SSS');
 
-      const firstDayOfYear = moment(date).startOf('year').format('YYYY-MM-DD HH:mm:ss.SSS');
-      const lastDayOfYear = moment(date).endOf('year').format('YYYY-MM-DD HH:mm:ss.SSS');
+      const firstDayOfMonth = moment(date)
+        .startOf('month')
+        .format('YYYY-MM-DD HH:mm:ss.SSS');
+      const lastDayOfMonth = moment(date)
+        .endOf('month')
+        .format('YYYY-MM-DD HH:mm:ss.SSS');
 
-      const firstDayOfMonth = moment(date).startOf('month').format('YYYY-MM-DD HH:mm:ss.SSS');
-      const lastDayOfMonth = moment(date).endOf('month').format('YYYY-MM-DD HH:mm:ss.SSS');
-
-      const firstHourOfDay = moment(date).startOf('day').format('YYYY-MM-DD HH:mm:ss.SSS');
-      const lastHourOfDay = moment(date).endOf('day').format('YYYY-MM-DD HH:mm:ss.SSS');
+      const firstHourOfDay = moment(date)
+        .startOf('day')
+        .format('YYYY-MM-DD HH:mm:ss.SSS');
+      const lastHourOfDay = moment(date)
+        .endOf('day')
+        .format('YYYY-MM-DD HH:mm:ss.SSS');
 
       const incomesPerYear = await this.incomeRepository.findBy({
-        created_at: Between(new Date(firstDayOfYear), new Date(lastDayOfYear))
+        created_at: Between(new Date(firstDayOfYear), new Date(lastDayOfYear)),
       });
 
       const incomesPerMonth = await this.incomeRepository.findBy({
-        created_at: Between(new Date(firstDayOfMonth), new Date(lastDayOfMonth))
+        created_at: Between(
+          new Date(firstDayOfMonth),
+          new Date(lastDayOfMonth),
+        ),
       });
 
       const incomesPerDay = await this.incomeRepository.findBy({
-        created_at: Between(new Date(firstHourOfDay), new Date(lastHourOfDay))
+        created_at: Between(new Date(firstHourOfDay), new Date(lastHourOfDay)),
       });
 
       let amountPerYear: number = 0;
@@ -67,35 +92,58 @@ export class FinancesService {
         amountPerDay += income.amount;
       });
 
-      const incomesPer = [amountPerYear, amountPerMonth, amountPerDay];
-      return new HttpResponse(true, 'Return incomes', { incomesPer })
+      const incomesPer = [
+        this.moneyService.toFixed(amountPerYear),
+        this.moneyService.toFixed(amountPerMonth),
+        this.moneyService.toFixed(amountPerDay),
+      ];
+      return new HttpResponse(true, 'Return incomes', { incomesPer });
     } catch (error) {
-      return new HttpResponse(false, 'Error into getIncomesPer', { error: error.message }, 400)
+      return new HttpResponse(
+        false,
+        'Error into getIncomesPer',
+        { error: error.message },
+        400,
+      );
     }
   }
 
   async getBillsPer(date: string) {
     try {
+      const firstDayOfYear = moment(date)
+        .startOf('year')
+        .format('YYYY-MM-DD HH:mm:ss.SSS');
+      const lastDayOfYear = moment(date)
+        .endOf('year')
+        .format('YYYY-MM-DD HH:mm:ss.SSS');
 
-      const firstDayOfYear = moment(date).startOf('year').format('YYYY-MM-DD HH:mm:ss.SSS');
-      const lastDayOfYear = moment(date).endOf('year').format('YYYY-MM-DD HH:mm:ss.SSS');
+      const firstDayOfMonth = moment(date)
+        .startOf('month')
+        .format('YYYY-MM-DD HH:mm:ss.SSS');
+      const lastDayOfMonth = moment(date)
+        .endOf('month')
+        .format('YYYY-MM-DD HH:mm:ss.SSS');
 
-      const firstDayOfMonth = moment(date).startOf('month').format('YYYY-MM-DD HH:mm:ss.SSS');
-      const lastDayOfMonth = moment(date).endOf('month').format('YYYY-MM-DD HH:mm:ss.SSS');
-
-      const firstHourOfDay = moment(date).startOf('day').format('YYYY-MM-DD HH:mm:ss.SSS');
-      const lastHourOfDay = moment(date).endOf('day').format('YYYY-MM-DD HH:mm:ss.SSS');
+      const firstHourOfDay = moment(date)
+        .startOf('day')
+        .format('YYYY-MM-DD HH:mm:ss.SSS');
+      const lastHourOfDay = moment(date)
+        .endOf('day')
+        .format('YYYY-MM-DD HH:mm:ss.SSS');
 
       const billsPerYear = await this.billRepository.findBy({
-        created_at: Between(new Date(firstDayOfYear), new Date(lastDayOfYear))
+        created_at: Between(new Date(firstDayOfYear), new Date(lastDayOfYear)),
       });
 
       const billsPerMonth = await this.billRepository.findBy({
-        created_at: Between(new Date(firstDayOfMonth), new Date(lastDayOfMonth))
+        created_at: Between(
+          new Date(firstDayOfMonth),
+          new Date(lastDayOfMonth),
+        ),
       });
 
       const billsPerDay = await this.billRepository.findBy({
-        created_at: Between(new Date(firstHourOfDay), new Date(lastHourOfDay))
+        created_at: Between(new Date(firstHourOfDay), new Date(lastHourOfDay)),
       });
 
       let amountPerYear: number = 0;
@@ -113,28 +161,45 @@ export class FinancesService {
         amountPerDay += bill.amount;
       });
 
-      const billsPer = [amountPerYear, amountPerMonth, amountPerDay];
-      return new HttpResponse(true, 'Return bills', { billsPer })
+      const billsPer = [
+        this.moneyService.toFixed(amountPerYear),
+        this.moneyService.toFixed(amountPerMonth),
+        this.moneyService.toFixed(amountPerDay),
+      ];
+      return new HttpResponse(true, 'Return bills', { billsPer });
     } catch (error) {
-      return new HttpResponse(false, 'Error into getIncomesPer', { error: error.message }, 400)
+      return new HttpResponse(
+        false,
+        'Error into getIncomesPer',
+        { error: error.message },
+        400,
+      );
     }
   }
 
   async getBillsInFormat() {
     try {
-      const bills = await this.billRepository.createQueryBuilder()
+      const bills = await this.billRepository
+        .createQueryBuilder()
         .select('created_at', 'name')
         .addSelect('amount', 'value')
         .execute();
 
       const billsInFormat = {
         name: 'Bills',
-        series: bills
-      }
+        series: bills,
+      };
 
-      return new HttpResponse(true, 'Bills find successfully!', { data: billsInFormat });
+      return new HttpResponse(true, 'Bills find successfully!', {
+        data: billsInFormat,
+      });
     } catch (error) {
-      return new HttpResponse(false, 'Error into getBillsInFormat', { error: error.message }, 400);
+      return new HttpResponse(
+        false,
+        'Error into getBillsInFormat',
+        { error: error.message },
+        400,
+      );
     }
   }
 
@@ -143,59 +208,77 @@ export class FinancesService {
       const bills = await this.billRepository.find({ relations: ['category'] });
 
       const grouped = bills.reduce((previousValue: any, currentValue: any) => {
-        (previousValue[currentValue.category['name']] = previousValue[currentValue.category['name']] || []).push(currentValue);
+        (previousValue[currentValue.category['name']] =
+          previousValue[currentValue.category['name']] || []).push(
+          currentValue,
+        );
         return previousValue;
       }, {});
 
-      let result = []
-      for (let key in grouped) {
-        let category = key;
+      const result = [];
+      for (const key in grouped) {
+        const category = key;
         let amount = 0;
-        for (let bill of grouped[category] as Bill[]) {
+        for (const bill of grouped[category] as Bill[]) {
           amount += bill.amount;
         }
         result.push({ category, amount });
       }
-      
-      result.sort((a, b) => a.amount - b.amount);
-      
 
-      return new HttpResponse(true, 'Top One Category find successfully!', result.pop());
+      result.sort((a, b) => a.amount - b.amount);
+
+      return new HttpResponse(
+        true,
+        'Top One Category find successfully!',
+        result.pop(),
+      );
     } catch (error) {
-      return new HttpResponse(false, error.message, { error: error.message }, 400);
+      return new HttpResponse(
+        false,
+        error.message,
+        { error: error.message },
+        400,
+      );
     }
   }
 
   async getIncomesVsBills(year: number) {
+    const incomesVsBill: IncomesVsBill[] = [];
 
-    let incomesVsBill: IncomesVsBill[] = [];
+    for (const month in MonthOfYear) {
+      const ivb: IncomesVsBill = new IncomesVsBill(month, []);
 
-    for (let month in MonthOfYear) {
-      let ivb: IncomesVsBill = new IncomesVsBill(month, []);
-
-      let first = moment(`${year}-${MonthOfYear[month]}-15`).startOf('month').format('YYYY-MM-DD HH:mm:ss.SSS');
-      let last = moment(`${year}-${MonthOfYear[month]}-15`).endOf('month').format('YYYY-MM-DD HH:mm:ss.SSS');
-
+      const first = moment(`${year}-${MonthOfYear[month]}-15`)
+        .startOf('month')
+        .format('YYYY-MM-DD HH:mm:ss.SSS');
+      const last = moment(`${year}-${MonthOfYear[month]}-15`)
+        .endOf('month')
+        .format('YYYY-MM-DD HH:mm:ss.SSS');
 
       const incomeOfMonth = await this.incomeRepository.findBy({
-        created_at: Between(new Date(first), new Date(last))
+        created_at: Between(new Date(first), new Date(last)),
       });
       let countIncome: number = 0.0;
-      for (let income of incomeOfMonth) {
+      for (const income of incomeOfMonth) {
         countIncome += income.amount;
       }
 
-
       const billsOfMonth = await this.billRepository.findBy({
-        created_at: Between(new Date(first), new Date(last))
-      })
+        created_at: Between(new Date(first), new Date(last)),
+      });
       let countBill: number = 0.0;
-      for (let bill of billsOfMonth) {
+      for (const bill of billsOfMonth) {
         countBill += bill.amount;
       }
 
-      let infoIncomes: InformationOfGraphic = new InformationOfGraphic("Incomes", parseFloat(countIncome.toFixed(2)));
-      let infoBills: InformationOfGraphic = new InformationOfGraphic("Bills", parseFloat(countBill.toFixed(2)));
+      const infoIncomes: InformationOfGraphic = new InformationOfGraphic(
+        'Incomes',
+        parseFloat(countIncome.toFixed(2)),
+      );
+      const infoBills: InformationOfGraphic = new InformationOfGraphic(
+        'Bills',
+        parseFloat(countBill.toFixed(2)),
+      );
 
       ivb.series.push(infoIncomes);
       ivb.series.push(infoBills);
@@ -206,32 +289,155 @@ export class FinancesService {
     return incomesVsBill;
   }
 
+  async getNoCompleteObjectives() {
+    try {
+      const noCompleteObjectives = await this.objectiveRepository.find({
+        where: { complete: false },
+        relations: { contributions: true },
+      });
+      for (const objective of noCompleteObjectives) {
+        let percentage: number = 0;
+        for (const contribution of objective.contributions) {
+          percentage += contribution.amount;
+        }
+        objective.percentage = percentage;
+      }
+      return new HttpResponse(
+        true,
+        'No complete objectives was successfully found!!',
+        noCompleteObjectives,
+      );
+    } catch (error) {
+      return new HttpResponse(
+        false,
+        'Error into getNoCompleteObjectives!!',
+        { error: error.message },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 
+  async getIncomes() {
+    try {
+      const incomes = await this.incomeRepository.find({
+        relations: {
+          origin: true,
+        },
+        where: {
+          visible: true,
+        },
+        order: {
+          created_at: 'desc',
+        },
+      });
 
+      return new HttpResponse(true, 'Return incomes', incomes);
+    } catch (error) {
+      return new HttpResponse(
+        false,
+        'Error into getIncomesPer',
+        { error: error.message },
+        400,
+      );
+    }
+  }
 
+  async getBills() {
+    try {
+      const bills = await this.billRepository.find({
+        relations: {
+          institution: true,
+          payment: true,
+          card: true,
+        },
+        where: {
+          visible: true,
+        },
+        order: {
+          created_at: 'desc',
+        },
+      });
 
+      return new HttpResponse(true, 'Return bills', bills);
+    } catch (error) {
+      return new HttpResponse(
+        false,
+        'Error into getIncomesPer',
+        { error: error.message },
+        400,
+      );
+    }
+  }
 
+  async getCategoriesToGraphic(options: CategoryOptions) {
+    try {
+      const categories: CategoryGraphic[] = [];
+      const othersCategory: CategoryGraphic = new CategoryGraphic(0, 'Others');
 
+      const firstDayOfYear = moment(`${options.year}-01-01`)
+        .startOf('year')
+        .format('YYYY-MM-DD HH:mm:ss.SSS');
+      const lastDayOfYear = moment(`${options.year}-01-01`)
+        .endOf('year')
+        .format('YYYY-MM-DD HH:mm:ss.SSS');
 
+      const response = await this.categoryRepository.find({
+        relations: { bills: true },
+        where: {
+          bills: {
+            created_at: Between(
+              new Date(firstDayOfYear),
+              new Date(lastDayOfYear),
+            ),
+          },
+        },
+      });
 
+      for (const category of response) {
+        if (category.graphic) {
+          const newCategory: CategoryGraphic = new CategoryGraphic(
+            category.id,
+            category.name,
+            category.icon,
+          );
 
-  // create(createFinanceDto: CreateFinanceDto) {
-  //   return 'This action adds a new finance';
-  // }
+          for (const bill of category.bills) {
+            newCategory.addValue(bill.amount);
+          }
 
-  // findAll() {
-  //   return `This action returns all finances`;
-  // }
+          const lastBill: Bill = category.bills.at(-1);
+          if (lastBill) {
+            newCategory.setLastBillDate(lastBill.created_at);
+          }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} finance`;
-  // }
+          categories.push(newCategory);
+          continue;
+        }
 
-  // update(id: number, updateFinanceDto: UpdateFinanceDto) {
-  //   return `This action updates a #${id} finance`;
-  // }
+        for (const bill of category.bills) {
+          othersCategory.addValue(bill.amount);
+        }
+      }
+      if (othersCategory.value !== 0) {
+        categories.push(othersCategory);
+      }
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} finance`;
-  // }
+      const resultCategories: CategoryGraphic[] = categories.sort(
+        (a, b) => a.value - b.value,
+      );
+
+      resultCategories.map((category: CategoryGraphic) => {
+        category.value = this.moneyService.toFixed(category.value);
+      });
+
+      return new HttpResponse(true, 'Return categories', resultCategories);
+    } catch (error) {
+      return new HttpResponse(
+        false,
+        'Error into getCategoriesToGraphic',
+        { error: error.message },
+        400,
+      );
+    }
+  }
 }

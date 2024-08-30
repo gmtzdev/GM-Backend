@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { FinancesService } from './finances.service';
+import { CategoryOptions } from 'src/shared/interfaces/categoryOptions';
 
 @Controller('finances')
 export class FinancesController {
-  constructor(private readonly financesService: FinancesService) { }
+  constructor(private readonly financesService: FinancesService) {}
 
   @Get('getIncomesPer/:date')
   getIncomesPer(@Param('date') date: string) {
@@ -16,12 +24,12 @@ export class FinancesController {
   }
 
   @Get('getBillsInFormat')
-  getBillsInFormat(){
+  getBillsInFormat() {
     return this.financesService.getBillsInFormat();
   }
 
   @Get('getTopOneCategory')
-  getTopOneCategory(){
+  getTopOneCategory() {
     return this.financesService.getTopOneCategory();
   }
 
@@ -30,18 +38,25 @@ export class FinancesController {
     return this.financesService.getIncomesVsBills(year);
   }
 
+  @Get('getNoCompleteObjectives')
+  async getNoCompleteObjectives() {
+    return this.financesService.getNoCompleteObjectives();
+  }
 
+  @Get('getIncomes')
+  async getIncomes() {
+    return this.financesService.getIncomes();
+  }
 
+  @Get('getBills')
+  async getBills() {
+    return this.financesService.getBills();
+  }
 
-
-
-
-
-
-
-
-
-
+  @Post('getCategoriesToGraphic')
+  async getCategoriesToGraphic(@Body('options') options: CategoryOptions) {
+    return this.financesService.getCategoriesToGraphic(options);
+  }
 
   // @Post()
   // create(@Body() createFinanceDto: CreateFinanceDto) {

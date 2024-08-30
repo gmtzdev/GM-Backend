@@ -9,6 +9,12 @@ export class Category {
     @Column({ nullable: false, unique: true })
     name: string;
 
+    @Column({ default: () => { return false } })
+    graphic: boolean;
+
+    @Column()
+    icon: string;
+
     @OneToMany(() => Bill, bill => bill.category)
-    bills: Bill[]
+    bills: Bill[];
 }

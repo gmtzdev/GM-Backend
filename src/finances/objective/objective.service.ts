@@ -11,21 +11,57 @@ import { HttpResponse } from 'src/shared/models/HttpResponse.model';
 export class ObjectiveService {
   constructor(
     @InjectRepository(Objective, 'finance')
-    private objectiveRepository: Repository<Objective>
-  ) { }
+    private objectiveRepository: Repository<Objective>,
+  ) {}
 
-  create(createObjectiveDto: CreateObjectiveDto) {
-    const newObjective = this.objectiveRepository.create(createObjectiveDto);
-    const objective = this.objectiveRepository.save(newObjective);
-    if (!(objective instanceof Objective)) {
-      // Error
-      return new HttpException('No objective created!!', HttpStatus.BAD_REQUEST, { cause: new Error('The objecte returned after creation is not a instance of Objective') });
+  async create(createObjectiveDto: CreateObjectiveDto) {
+    try {
+      const newObjective = this.objectiveRepository.create(createObjectiveDto);
+      const objective = await this.objectiveRepository.save(newObjective);
+      if (!(objective instanceof Objective)) {
+        // Error
+        return new HttpException(
+          'No objective created!!',
+          HttpStatus.BAD_REQUEST,
+          {
+            cause: {
+              message:
+                'The objecte returned after creation is not a instance of Objective',
+            },
+          },
+        );
+      }
+      return new HttpResponse(
+        true,
+        'Objective created successfully!!',
+        objective,
+        HttpStatus.CREATED,
+      );
+    } catch (error) {
+      return new HttpException(
+        'No objective created!!',
+        HttpStatus.BAD_REQUEST,
+        { cause: { error: error.message } },
+      );
     }
-    return new HttpResponse(true, 'Objective created successfully!!', objective, HttpStatus.CREATED);
   }
 
-  findAll() {
-    return `This action returns all objective`;
+  async findAll() {
+    try {
+      const objectives = await this.objectiveRepository.find();
+      return new HttpResponse(
+        true,
+        'Objectives were successfully found!',
+        objectives,
+      );
+    } catch (error) {
+      return new HttpResponse(
+        false,
+        'Error when searching for Objectives',
+        { error: error.message },
+        400,
+      );
+    }
   }
 
   findOne(id: number) {
@@ -33,6 +69,7 @@ export class ObjectiveService {
   }
 
   update(id: number, updateObjectiveDto: UpdateObjectiveDto) {
+    console.log(updateObjectiveDto);
     return `This action updates a #${id} objective`;
   }
 

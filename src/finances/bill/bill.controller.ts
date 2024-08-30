@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
+// Res
 import { BillService } from './bill.service';
 import { CreateBillDto } from './dto/create-bill.dto';
 import { UpdateBillDto } from './dto/update-bill.dto';
+// import { Response } from 'express';
 
 @Controller('bill')
 export class BillController {
@@ -18,12 +28,14 @@ export class BillController {
   }
 
   @Get(':id')
+  // , @Res() res: Response
   findOne(@Param('id') id: string) {
+    // return res.status().json()
     return this.billService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBillDto: UpdateBillDto) {
+  update(@Param('id') id: string, @Body('bill') updateBillDto: UpdateBillDto) {
     return this.billService.update(+id, updateBillDto);
   }
 

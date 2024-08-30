@@ -19,5 +19,5 @@ export class Contribution {
     removed: boolean;
 
     @ManyToOne(() => Objective, objective => objective.contributions)
-    objective: Objective
+    objective: Objective;
 }
