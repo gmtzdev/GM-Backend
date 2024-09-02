@@ -20,6 +20,8 @@ import { Institution } from './finances/institution/entities/institution.entity'
 import { Objective } from './finances/objective/entities/objective.entity';
 import { Origin } from './finances/origin/entities/origin.entity';
 import { Payment } from './finances/payment/entities/payment.entity';
+import { Debt } from './finances/debt/entities/debt.entity';
+import { DebtPayment } from './finances/debt-payment/entities/debt-payment.entity';
 
 import { BillModule } from './finances/bill/bill.module';
 import { CardModule } from './finances/card/card.module';
@@ -30,6 +32,8 @@ import { InstitutionModule } from './finances/institution/institution.module';
 import { ObjectiveModule } from './finances/objective/objective.module';
 import { OriginModule } from './finances/origin/origin.module';
 import { PaymentModule } from './finances/payment/payment.module';
+import { DebtModule } from './finances/debt/debt.module';
+import { DebtPaymentModule } from './finances/debt-payment/debt-payment.module';
 
 // Productivity
 import { ListModule } from './productivity/list/list.module';
@@ -80,6 +84,8 @@ import { ConfigModule } from '@nestjs/config';
         Objective,
         Origin,
         Payment,
+        Debt,
+        DebtPayment,
       ],
       name: process.env.DB_DATABASE_TWO,
       synchronize: true,
@@ -109,6 +115,8 @@ import { ConfigModule } from '@nestjs/config';
     ObjectiveModule,
     OriginModule,
     PaymentModule,
+    DebtModule,
+    DebtPaymentModule,
 
     // Global
     // GeneralModule,
