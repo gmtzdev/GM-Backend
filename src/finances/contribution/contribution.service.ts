@@ -4,7 +4,7 @@ import { UpdateContributionDto } from './dto/update-contribution.dto';
 import { Repository } from 'typeorm';
 import { Contribution } from './entities/contribution.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { HttpResponse } from 'src/shared/models/HttpResponse.model';
+import { HttpResponse } from 'src/core/models/http/HttpResponse.model';
 
 @Injectable()
 export class ContributionService {

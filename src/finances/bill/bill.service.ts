@@ -1,60 +1,63 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateBillDto } from './dto/create-bill.dto';
 import { UpdateBillDto } from './dto/update-bill.dto';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Bill } from './entities/bill.entity';
-import { HttpResponse } from 'src/shared/models/HttpResponse.model';
+import { HttpResponse } from 'src/core/models/http/HttpResponse.model';
 
 @Injectable()
 export class BillService {
   constructor(
     @InjectRepository(Bill, 'finance')
-    private billRepository: Repository<Bill>
-  ) { }
+    private billRepository: Repository<Bill>,
+  ) {}
 
   async create(createBillDto: CreateBillDto) {
     const newBill = this.billRepository.create(createBillDto);
     const bill = await this.billRepository.save(newBill);
     if (!(bill instanceof Bill)) {
-      // Error
+      throw new HttpException('Bill not created', HttpStatus.BAD_REQUEST);
     }
     return new HttpResponse(true, 'Bill created successfully', bill);
   }
 
-  findAll() {
-    return this.billRepository.find();
+  async findAll() {
+    const bills = await this.billRepository.find();
+    return new HttpResponse(true, 'Bills were found!', bills);
   }
 
   async findOne(id: number) {
-    try {
-      const bill = await this.billRepository.findOne({
-        where: { id },
-        relations: {
-          institution: true,
-          payment: true,
-          card: true,
-          category: true
-        }
-      });
+    const bill = await this.billRepository.findOne({
+      where: { id },
+      relations: {
+        institution: true,
+        payment: true,
+        card: true,
+        category: true,
+      },
+    });
 
-      if (!bill) {
-        return new HttpResponse(false, 'Error into findOne', { error: 'The bill was not found.' }, HttpStatus.NOT_FOUND);
-      }
-
-      return new HttpResponse(true, 'The bill was found', bill);
-    } catch (error) {
-      return new HttpResponse(false, 'Error into findOne', { error: error.message }, 400);
+    if (!bill) {
+      throw new HttpException(
+        `The bill with id: ${id} was not found`,
+        HttpStatus.NOT_FOUND,
+      );
     }
+
+    return new HttpResponse(true, 'The bill was found', bill);
   }
 
   async update(id: number, updateBillDto: UpdateBillDto) {
     const bill = this.billRepository.findOne({ where: { id } });
     if (!bill) {
-      return new HttpResponse(false, 'Error into update', { error: `The bill with id: ${id} not found` }, HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        `The bill with id: ${id} not found`,
+        HttpStatus.NOT_FOUND,
+      );
     }
-    
+
     const updatedBill = await this.billRepository.save(updateBillDto);
 
     return new HttpResponse(true, 'Bill updated successfully', updatedBill);

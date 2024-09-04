@@ -19,7 +19,7 @@ import { CategoryOptions } from 'src/shared/interfaces/categoryOptions';
 // Model
 import { IncomesVsBill } from 'src/shared/models/IncomesVsBill.model';
 import { InformationOfGraphic } from 'src/shared/models/InformationOfGraphic.model';
-import { HttpResponse } from 'src/shared/models/HttpResponse.model';
+import { HttpResponse } from 'src/core/models/http/HttpResponse.model';
 
 // Services
 import { MoneyService } from 'src/shared/services/money.service';

@@ -11,7 +11,6 @@ import {
 import { BillService } from './bill.service';
 import { CreateBillDto } from './dto/create-bill.dto';
 import { UpdateBillDto } from './dto/update-bill.dto';
-// import { Response } from 'express';
 
 @Controller('finances/bill')
 export class BillController {
@@ -23,7 +22,7 @@ export class BillController {
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.billService.findAll();
   }
 

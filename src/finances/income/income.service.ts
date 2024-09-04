@@ -5,20 +5,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Income } from './entities/income.entity';
-import { HttpResponse } from 'src/shared/models/HttpResponse.model';
+import { HttpResponse } from 'src/core/models/http/HttpResponse.model';
 
 @Injectable()
 export class IncomeService {
-
   constructor(
     @InjectRepository(Income, 'finance')
-    private incomeRepository: Repository<Income>
-  ){}
+    private incomeRepository: Repository<Income>,
+  ) {}
 
   async create(createIncomeDto: CreateIncomeDto) {
     const newIncome = this.incomeRepository.create(createIncomeDto);
     const income = await this.incomeRepository.save(newIncome);
-    if(!(income instanceof Income)){
+    if (!(income instanceof Income)) {
       // Error
     }
     return new HttpResponse(true, 'Income created successfully', income);
@@ -33,6 +32,7 @@ export class IncomeService {
   }
 
   update(id: number, updateIncomeDto: UpdateIncomeDto) {
+    console.log(updateIncomeDto);
     return `This action updates a #${id} income`;
   }
 

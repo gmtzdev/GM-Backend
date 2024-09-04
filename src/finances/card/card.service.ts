@@ -7,11 +7,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class CardService {
-
   constructor(
     @InjectRepository(Card, 'finance')
-    private cardRepository: Repository<Card>
-  ) { }
+    private cardRepository: Repository<Card>,
+  ) {}
+
   create(createCardDto: CreateCardDto) {
     const newCard = this.cardRepository.create(createCardDto);
     return this.cardRepository.save(newCard);
@@ -26,6 +26,7 @@ export class CardService {
   }
 
   update(id: number, updateCardDto: UpdateCardDto) {
+    console.log(updateCardDto);
     return `This action updates a #${id} card`;
   }
 

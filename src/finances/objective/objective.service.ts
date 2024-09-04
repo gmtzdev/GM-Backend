@@ -5,7 +5,7 @@ import { UpdateObjectiveDto } from './dto/update-objective.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Objective } from './entities/objective.entity';
-import { HttpResponse } from 'src/shared/models/HttpResponse.model';
+import { HttpResponse } from 'src/core/models/http/HttpResponse.model';
 
 @Injectable()
 export class ObjectiveService {
