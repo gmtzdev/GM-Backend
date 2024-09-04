@@ -23,18 +23,6 @@ import { Payment } from './finances/payment/entities/payment.entity';
 import { Debt } from './finances/debt/entities/debt.entity';
 import { DebtPayment } from './finances/debt-payment/entities/debt-payment.entity';
 
-import { BillModule } from './finances/bill/bill.module';
-import { CardModule } from './finances/card/card.module';
-import { CategoryModule } from './finances/category/category.module';
-import { ContributionModule } from './finances/contribution/contribution.module';
-import { IncomeModule } from './finances/income/income.module';
-import { InstitutionModule } from './finances/institution/institution.module';
-import { ObjectiveModule } from './finances/objective/objective.module';
-import { OriginModule } from './finances/origin/origin.module';
-import { PaymentModule } from './finances/payment/payment.module';
-import { DebtModule } from './finances/debt/debt.module';
-import { DebtPaymentModule } from './finances/debt-payment/debt-payment.module';
-
 // Productivity
 import { ListModule } from './productivity/list/list.module';
 import { TaskModule } from './productivity/task/task.module';
@@ -46,7 +34,8 @@ import { CategoryTask } from './productivity/category-task/entities/category-tas
 
 // API
 // import { GeneralModule } from './api/general/general.module';
-import { FinancesModule } from './api/finances/finances.module';
+import { FinancesModule } from './finances/finances.module';
+
 import { Contribution } from './finances/contribution/entities/contribution.entity';
 import { ConfigModule } from '@nestjs/config';
 
@@ -104,22 +93,6 @@ import { ConfigModule } from '@nestjs/config';
 
     NavItemModule,
     // UserModule,
-
-    // Finances
-    BillModule,
-    CardModule,
-    CategoryModule,
-    ContributionModule,
-    IncomeModule,
-    InstitutionModule,
-    ObjectiveModule,
-    OriginModule,
-    PaymentModule,
-    DebtModule,
-    DebtPaymentModule,
-
-    // Global
-    // GeneralModule,
 
     // Finances
     FinancesModule,

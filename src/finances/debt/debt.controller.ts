@@ -12,7 +12,7 @@ import { CreateDebtDto } from './dto/create-debt.dto';
 import { UpdateDebtDto } from './dto/update-debt.dto';
 import { Debt } from './entities/debt.entity';
 
-@Controller('debt')
+@Controller('finances/debt')
 export class DebtController {
   constructor(private readonly debtService: DebtService) {}
 

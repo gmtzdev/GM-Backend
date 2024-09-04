@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ObjectiveService } from './objective.service';
 import { CreateObjectiveDto } from './dto/create-objective.dto';
 import { UpdateObjectiveDto } from './dto/update-objective.dto';
 
-@Controller('objective')
+@Controller('finances/objective')
 export class ObjectiveController {
   constructor(private readonly objectiveService: ObjectiveService) {}
 
@@ -23,7 +31,10 @@ export class ObjectiveController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateObjectiveDto: UpdateObjectiveDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateObjectiveDto: UpdateObjectiveDto,
+  ) {
     return this.objectiveService.update(+id, updateObjectiveDto);
   }
 

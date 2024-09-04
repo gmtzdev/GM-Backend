@@ -11,7 +11,7 @@ import { DebtPaymentService } from './debt-payment.service';
 import { CreateDebtPaymentDto } from './dto/create-debt-payment.dto';
 import { UpdateDebtPaymentDto } from './dto/update-debt-payment.dto';
 
-@Controller('debtPayment')
+@Controller('finances/debtPayment')
 export class DebtPaymentController {
   constructor(private readonly debtPaymentService: DebtPaymentService) {}
 

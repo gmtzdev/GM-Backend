@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ContributionService } from './contribution.service';
 import { CreateContributionDto } from './dto/create-contribution.dto';
 import { UpdateContributionDto } from './dto/update-contribution.dto';
 
-@Controller('contribution')
+@Controller('finances/contribution')
 export class ContributionController {
   constructor(private readonly contributionService: ContributionService) {}
 
@@ -23,7 +31,10 @@ export class ContributionController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateContributionDto: UpdateContributionDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateContributionDto: UpdateContributionDto,
+  ) {
     return this.contributionService.update(+id, updateContributionDto);
   }
 
