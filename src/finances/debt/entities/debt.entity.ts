@@ -22,6 +22,9 @@ export class Debt {
   @Column({ type: 'double' })
   amount: number;
 
+  @Column({ type: 'double' })
+  paid: number;
+
   @Column({ type: 'double', default: 0 })
   percentage: number;
 

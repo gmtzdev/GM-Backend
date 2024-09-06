@@ -8,10 +8,14 @@ import {
 } from '@nestjs/common';
 import { FinancesService } from './finances.service';
 import { CategoryOptions } from 'src/shared/interfaces/categoryOptions';
+import { DebtService } from './debt/debt.service';
 
 @Controller('finances')
 export class FinancesController {
-  constructor(private readonly financesService: FinancesService) {}
+  constructor(
+    private readonly financesService: FinancesService,
+    private readonly debtService: DebtService,
+  ) {}
 
   @Get('getIncomesPer/:date')
   getIncomesPer(@Param('date') date: string) {
@@ -58,28 +62,8 @@ export class FinancesController {
     return this.financesService.getCategoriesToGraphic(options);
   }
 
-  // @Post()
-  // create(@Body() createFinanceDto: CreateFinanceDto) {
-  //   return this.financesService.create(createFinanceDto);
-  // }
-
-  // @Get()
-  // findAll() {
-  //   return this.financesService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.financesService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateFinanceDto: UpdateFinanceDto) {
-  //   return this.financesService.update(+id, updateFinanceDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.financesService.remove(+id);
-  // }
+  @Get('getNoCompleteDebts')
+  getNoCompleteDebts() {
+    return this.debtService.getNoCompleteDebts();
+  }
 }

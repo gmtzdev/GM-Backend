@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Debt } from './entities/debt.entity';
 import { Repository } from 'typeorm';
 import { DebtPayment } from '../debt-payment/entities/debt-payment.entity';
+import { HttpResponse } from 'src/core/models/http/HttpResponse.model';
 
 @Injectable()
 export class DebtService {
@@ -13,7 +14,7 @@ export class DebtService {
     private readonly debtRepository: Repository<Debt>,
   ) {}
 
-  async create(createDebtDto: CreateDebtDto) {
+  public async create(createDebtDto: CreateDebtDto) {
     const newDebt = this.debtRepository.create(createDebtDto);
     const debt = await this.debtRepository.save(newDebt);
     if (!(debt instanceof Debt)) {
@@ -22,17 +23,17 @@ export class DebtService {
     return debt;
   }
 
-  async findAll() {
+  public async findAll() {
     const debts: Debt[] = await this.debtRepository.find({
       relations: { debtPayments: true },
     });
-    return debts;
+    return new HttpResponse(true, 'Debts were found!!', debts);
   }
 
   // Method signatures
-  async findOne(id: number): Promise<Debt>;
-  async findOne(debt: Debt): Promise<Debt>;
-  async findOne(data: number | Debt): Promise<Debt> {
+  public async findOne(id: number): Promise<Debt>;
+  public async findOne(debt: Debt): Promise<Debt>;
+  public async findOne(data: number | Debt): Promise<Debt> {
     if (typeof data === 'number') {
       const debt: Debt = await this.debtRepository.findOneBy({ id: data });
       return debt;
@@ -41,12 +42,12 @@ export class DebtService {
     return debt;
   }
 
-  update(id: number, updateDebtDto: UpdateDebtDto) {
+  public update(id: number, updateDebtDto: UpdateDebtDto) {
     console.log(updateDebtDto);
     return `This action updates a #${id} debt`;
   }
 
-  remove(id: number) {
+  public remove(id: number) {
     return `This action removes a #${id} debt`;
   }
 
@@ -62,9 +63,11 @@ export class DebtService {
     }
   }
 
-  async calculatePercentage(id: number): Promise<boolean>;
-  async calculatePercentage(debt: Debt): Promise<boolean>;
-  async calculatePercentage(data: number | Debt): Promise<boolean | Error> {
+  public async calculatePercentage(id: number): Promise<boolean>;
+  public async calculatePercentage(debt: Debt): Promise<boolean>;
+  public async calculatePercentage(
+    data: number | Debt,
+  ): Promise<boolean | Error> {
     let debt: Debt;
     if (typeof data === 'number')
       debt = await this.debtRepository.findOne({
@@ -102,6 +105,25 @@ export class DebtService {
     this.isCompleted(debt, c);
 
     return true;
+  }
+
+  public async getNoCompleteDebts() {
+    const noCompleteDebts = await this.debtRepository.find({
+      where: { complete: false },
+      relations: { debtPayments: true },
+    });
+    for (const debt of noCompleteDebts) {
+      let paid: number = 0;
+      for (const debtPayment of debt.debtPayments) {
+        paid += debtPayment.amount;
+      }
+      debt.paid = paid;
+    }
+    return new HttpResponse(
+      true,
+      'No complete objectives were successfully found!!',
+      noCompleteDebts,
+    );
   }
 
   public test(debt: Debt): string {
