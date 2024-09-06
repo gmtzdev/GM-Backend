@@ -286,7 +286,11 @@ export class FinancesService {
       incomesVsBill.push(ivb);
     }
 
-    return incomesVsBill;
+    return new HttpResponse(
+      true,
+      'Incomes and Bills were found!!',
+      incomesVsBill,
+    );
   }
 
   async getNoCompleteObjectives() {

@@ -23,8 +23,9 @@ export class InstitutionService {
     return new HttpResponse(true, 'Bill created successfully', institution);
   }
 
-  findAll() {
-    return this.institutionRepository.find();
+  async findAll() {
+    const institutions = await this.institutionRepository.find();
+    return new HttpResponse(true, 'Institutions were found!!', institutions);
   }
 
   findOne(id: number) {
