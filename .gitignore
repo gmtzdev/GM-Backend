@@ -4,6 +4,7 @@
 /build
 /.husky
 /.vscode
+/database
 
 # Logs
 logs

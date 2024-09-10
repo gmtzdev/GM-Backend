@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  ValidationPipe,
+  UsePipes,
 } from '@nestjs/common';
 // Res
 import { BillService } from './bill.service';
@@ -17,7 +19,24 @@ export class BillController {
   constructor(private readonly billService: BillService) {}
 
   @Post()
-  create(@Body('bill') createBillDto: CreateBillDto) {
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: false,
+      transform: true,
+    }),
+  )
+  create(
+    @Body(
+      'bill',
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: false,
+        transform: true,
+      }),
+    )
+    createBillDto: CreateBillDto,
+  ) {
     return this.billService.create(createBillDto);
   }
 

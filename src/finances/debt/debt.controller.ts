@@ -27,8 +27,8 @@ export class DebtController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.debtService.findOne(+id);
+  findOneByID(@Param('id') id: string) {
+    return this.debtService.findOneByID(+id);
   }
 
   @Patch(':id')

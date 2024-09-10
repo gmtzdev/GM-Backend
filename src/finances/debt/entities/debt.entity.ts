@@ -1,8 +1,10 @@
 import { DebtPayment } from 'src/finances/debt-payment/entities/debt-payment.entity';
+import { Institution } from 'src/finances/institution/entities/institution.entity';
 import {
   Column,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -47,4 +49,7 @@ export class Debt {
 
   @OneToMany(() => DebtPayment, (debtPayment) => debtPayment.debt)
   debtPayments: DebtPayment[];
+
+  @ManyToOne(() => Institution, (institution) => institution.debts)
+  institution: Institution;
 }

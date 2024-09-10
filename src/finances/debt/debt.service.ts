@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateDebtDto } from './dto/create-debt.dto';
 import { UpdateDebtDto } from './dto/update-debt.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -38,13 +38,32 @@ export class DebtService {
       const debt: Debt = await this.debtRepository.findOneBy({ id: data });
       return debt;
     }
-    const debt: Debt = await this.debtRepository.findOneBy(data);
+    const debt: Debt = await this.debtRepository.findOne({
+      where: { id: data.id },
+    });
     return debt;
   }
 
-  public update(id: number, updateDebtDto: UpdateDebtDto) {
-    console.log(updateDebtDto);
-    return `This action updates a #${id} debt`;
+  public async findOneByID(id: number) {
+    const debt = await this.findOne(id);
+    if (!debt) {
+      throw new HttpException(
+        `Debt with id: ${id} not found!`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return new HttpResponse(true, 'Debt was found!', debt);
+  }
+
+  public async update(id: number, updateDebtDto: UpdateDebtDto) {
+    const result = await this.debtRepository.update({ id }, updateDebtDto);
+    if (result.affected !== 1) {
+      throw new HttpException(
+        `Some error ocurred updating debt with id: ${id}`,
+        HttpStatus.NOT_MODIFIED,
+      );
+    }
+    return new HttpResponse(true, `Update a #${id} debt`, updateDebtDto);
   }
 
   public remove(id: number) {
@@ -95,7 +114,7 @@ export class DebtService {
 
     const updated = await this.debtRepository.update(
       { id: debt.id },
-      { percentage: percentage },
+      { percentage: percentage, paid: c },
     );
 
     if (updated.affected !== 1) {
@@ -126,8 +145,8 @@ export class DebtService {
     );
   }
 
-  public test(debt: Debt): string {
-    console.log(debt);
-    return 'Hello World';
+  public async test(debt: Debt): Promise<HttpResponse> {
+    const calculated = await this.calculatePercentage(debt.id);
+    return new HttpResponse(true, 'Hello World', calculated);
   }
 }

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { InstitutionService } from './institution.service';
 import { CreateInstitutionDto } from './dto/create-institution.dto';
@@ -23,6 +24,16 @@ export class InstitutionController {
   @Get()
   findAll() {
     return this.institutionService.findAll();
+  }
+
+  @Get('withDebts')
+  findAllWithDebt() {
+    return this.institutionService.findAllWithDebt();
+  }
+
+  @Get('find')
+  findByName(@Query('name') name: string) {
+    return this.institutionService.findByName(name);
   }
 
   @Get(':id')

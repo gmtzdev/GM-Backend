@@ -24,6 +24,7 @@ export class HttpResponseInterceptor implements NestInterceptor {
       }),
 
       catchError((error) => {
+        console.log(error);
         if (error instanceof HttpException) {
           const method =
             error.stack.split('\n')[1].split('at')[1].split(' ')[1] || '';

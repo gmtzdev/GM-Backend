@@ -9,5 +9,6 @@ import { DebtModule } from '../debt/debt.module';
   imports: [TypeOrmModule.forFeature([DebtPayment], 'finance'), DebtModule],
   controllers: [DebtPaymentController],
   providers: [DebtPaymentService],
+  exports: [DebtPaymentService],
 })
 export class DebtPaymentModule {}

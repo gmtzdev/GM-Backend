@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateInstitutionDto } from './dto/create-institution.dto';
 import { UpdateInstitutionDto } from './dto/update-institution.dto';
 import { Repository } from 'typeorm';
@@ -20,7 +20,11 @@ export class InstitutionService {
     if (!(institution instanceof Institution)) {
       // Error
     }
-    return new HttpResponse(true, 'Bill created successfully', institution);
+    return new HttpResponse(
+      true,
+      'Institution created successfully',
+      institution,
+    );
   }
 
   async findAll() {
@@ -28,13 +32,47 @@ export class InstitutionService {
     return new HttpResponse(true, 'Institutions were found!!', institutions);
   }
 
+  public async findAllWithDebt() {
+    const institutions = await this.institutionRepository.find({
+      relations: { debts: true },
+    });
+    return new HttpResponse(true, 'Institutions were found!!', institutions);
+  }
+
+  public async findByName(name: string) {
+    const institutions = await this.institutionRepository
+      .createQueryBuilder('inst')
+      .where('inst.name like :name', { name: `%${name}%` })
+      .getManyAndCount();
+    if (!institutions) {
+      throw new HttpException(
+        `Institutions with name like #${name}# were not found!!`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return new HttpResponse(true, 'Institutions were found!!', institutions);
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} institution`;
   }
 
-  update(id: number, updateInstitutionDto: UpdateInstitutionDto) {
-    console.log(updateInstitutionDto);
-    return `This action updates a #${id} institution`;
+  public async update(id: number, updateInstitutionDto: UpdateInstitutionDto) {
+    const result = await this.institutionRepository.update(
+      id,
+      updateInstitutionDto,
+    );
+    if (result.affected !== 1) {
+      throw new HttpException(
+        `Some error ocurred updating institution with id: ${id}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return new HttpResponse(
+      true,
+      `Update a #${id} institution`,
+      updateInstitutionDto,
+    );
   }
 
   remove(id: number) {
