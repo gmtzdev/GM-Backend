@@ -9,12 +9,14 @@ import {
 import { FinancesService } from './finances.service';
 import { CategoryOptions } from 'src/shared/interfaces/categoryOptions';
 import { DebtService } from './debt/debt.service';
+import { PayCreditCardService } from './pay-credit-card/pay-credit-card.service';
 
 @Controller('finances')
 export class FinancesController {
   constructor(
     private readonly financesService: FinancesService,
     private readonly debtService: DebtService,
+    private readonly payCreditCardService: PayCreditCardService,
   ) {}
 
   @Get('getIncomesPer/:date')
@@ -35,6 +37,21 @@ export class FinancesController {
   @Get('getTopOneCategory')
   getTopOneCategory() {
     return this.financesService.getTopOneCategory();
+  }
+
+  @Get('getCurrentDatePayCreditCard')
+  getCurrentDate() {
+    return this.payCreditCardService.getCurrentDatePayCreditCard();
+  }
+
+  @Get('getDaysToPayCreditCard')
+  getDaysToPayCreditCard() {
+    return this.payCreditCardService.getDaysToPayCreditCard();
+  }
+
+  @Get('getAmountSpendWithCreditCard')
+  getAmountSpendWithCreditCard() {
+    return this.financesService.getAmountSpendWithCreditCard();
   }
 
   @Get('getIncomesVsBills/:year')

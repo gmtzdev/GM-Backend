@@ -24,6 +24,7 @@ import { InstitutionModule } from './institution/institution.module';
 import { ObjectiveModule } from './objective/objective.module';
 import { OriginModule } from './origin/origin.module';
 import { PaymentModule } from './payment/payment.module';
+import { PayCreditCardModule } from './pay-credit-card/pay-credit-card.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { PaymentModule } from './payment/payment.module';
     ObjectiveModule,
     OriginModule,
     PaymentModule,
+    PayCreditCardModule,
   ],
   controllers: [FinancesController],
   providers: [FinancesService, MoneyService],

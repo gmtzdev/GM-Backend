@@ -2,7 +2,7 @@ import * as moment from 'moment';
 import { HttpStatus, Injectable } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Repository } from 'typeorm';
+import { Between, MoreThanOrEqual, Repository } from 'typeorm';
 
 // Entity
 import { Income } from 'src/finances/income/entities/income.entity';
@@ -24,6 +24,7 @@ import { HttpResponse } from 'src/core/models/http/HttpResponse.model';
 // Services
 import { MoneyService } from 'src/shared/services/money.service';
 import { CategoryGraphic } from 'src/shared/models/categoryGraphic';
+import { PayCreditCardService } from './pay-credit-card/pay-credit-card.service';
 
 @Injectable()
 export class FinancesService {
@@ -37,9 +38,15 @@ export class FinancesService {
     @InjectRepository(Category, 'finance')
     private categoryRepository: Repository<Category>,
     private moneyService: MoneyService,
+    private readonly payCreditCardService: PayCreditCardService,
   ) {}
 
-  async getIncomesPer(date: string) {
+  /**
+   *
+   * @param date
+   * @returns
+   */
+  async getIncomesPer(date: string): Promise<HttpResponse> {
     try {
       const firstDayOfYear = moment(date)
         .startOf('year')
@@ -443,5 +450,38 @@ export class FinancesService {
         400,
       );
     }
+  }
+
+  /**
+   * Returns the amount and the percentage of the credit card limit spent in current period
+   *
+   * @returns {Promise<HttpResponse>}
+   */
+  async getAmountSpendWithCreditCard(): Promise<HttpResponse> {
+    const currentPeriod = await this.payCreditCardService.getLastRegister();
+    const limit = 7000;
+
+    const bills = await this.billRepository.find({
+      where: {
+        card: { id: 3 },
+        created_at: MoreThanOrEqual(currentPeriod.cutOffDate),
+      },
+      order: {
+        created_at: 'desc',
+      },
+    });
+
+    let amount = 0;
+    for (const bill of bills) {
+      amount += bill.amount;
+    }
+
+    const percentage = Math.round((amount * 100) / limit);
+
+    return new HttpResponse(
+      true,
+      'Returns the amount and the percentage of the credit card limit spent',
+      { amount, percentage },
+    );
   }
 }

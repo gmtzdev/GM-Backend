@@ -10,7 +10,7 @@ export class Institution {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ default: '' })
   location: string;
 
   @OneToMany(() => Bill, (bill) => bill.institution)

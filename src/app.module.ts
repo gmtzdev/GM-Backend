@@ -38,6 +38,7 @@ import { FinancesModule } from './finances/finances.module';
 
 import { Contribution } from './finances/contribution/entities/contribution.entity';
 import { ConfigModule } from '@nestjs/config';
+import { PayCreditCard } from './finances/pay-credit-card/entities/pay-credit-card.entity';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { ConfigModule } from '@nestjs/config';
         Payment,
         Debt,
         DebtPayment,
+        PayCreditCard,
       ],
       name: process.env.DB_DATABASE_TWO,
       synchronize: true,
