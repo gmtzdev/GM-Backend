@@ -4,6 +4,7 @@ import { UpdateCategoryTaskDto } from './dto/update-category-task.dto';
 import { Repository } from 'typeorm';
 import { CategoryTask } from './entities/category-task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { HttpResponse } from 'src/core/models/http/HttpResponse.model';
 
 @Injectable()
 export class CategoryTaskService {
@@ -41,8 +42,9 @@ export class CategoryTaskService {
     return this.categoryTaskRepository.save(createCategoryTaskDto);
   }
 
-  public findAll(): Promise<CategoryTask[]> {
-    return this.categoryTaskRepository.find();
+  public async findAll(): Promise<HttpResponse> {
+    const categories = await this.categoryTaskRepository.find();
+    return new HttpResponse(true, 'All categories task finded', categories);
   }
 
   public findOne(id: number): Promise<CategoryTask> {

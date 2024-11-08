@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CategoryTaskService } from './category-task.service';
 import { CreateCategoryTaskDto } from './dto/create-category-task.dto';
 import { UpdateCategoryTaskDto } from './dto/update-category-task.dto';
 
-@Controller('category-task')
+@Controller('productivity/category-task')
 export class CategoryTaskController {
   constructor(private readonly categoryTaskService: CategoryTaskService) {}
 
@@ -23,7 +31,10 @@ export class CategoryTaskController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryTaskDto: UpdateCategoryTaskDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCategoryTaskDto: UpdateCategoryTaskDto,
+  ) {
     return this.categoryTaskService.update(+id, updateCategoryTaskDto);
   }
 

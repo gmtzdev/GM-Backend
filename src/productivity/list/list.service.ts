@@ -4,6 +4,7 @@ import { UpdateListDto } from './dto/update-list.dto';
 import { Repository } from 'typeorm';
 import { List } from './entities/list.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { HttpResponse } from 'src/core/models/http/HttpResponse.model';
 
 @Injectable()
 export class ListService {
@@ -32,8 +33,9 @@ export class ListService {
     this.listRepository.save(createListDto);
   }
 
-  public findAll(): Promise<List[]> {
-    return this.listRepository.find();
+  public async findAll(): Promise<HttpResponse> {
+    const lists = await this.listRepository.find();
+    return new HttpResponse(true, 'All list finded', lists);
   }
 
   public findOne(id: number): Promise<List> {

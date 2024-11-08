@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Repository } from 'typeorm';
@@ -6,6 +6,8 @@ import { Task } from './entities/task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryTaskService } from '../category-task/category-task.service';
 import { ListService } from '../list/list.service';
+import { HttpResponse } from 'src/core/models/http/HttpResponse.model';
+import { SetReadyTaskDto } from './dto/setready-task.dto';
 
 @Injectable()
 export class TaskService {
@@ -16,7 +18,7 @@ export class TaskService {
     private readonly categoryTaskService: CategoryTaskService,
   ) {}
 
-  public async create(createTaskDto: CreateTaskDto) {
+  public async create(createTaskDto: CreateTaskDto): Promise<HttpResponse> {
     if (!createTaskDto.list) {
       createTaskDto.list = await this.listService.getDefaultList();
     }
@@ -25,13 +27,15 @@ export class TaskService {
         await this.categoryTaskService.getDefaultCategory(),
       ];
     }
-    return this.taskRepository.save(createTaskDto);
+    const task = await this.taskRepository.save(createTaskDto);
+    return new HttpResponse(true, `Task created successfully`, task);
   }
 
-  public findAll(): Promise<Task[]> {
-    return this.taskRepository.find({
+  public async findAll(): Promise<HttpResponse> {
+    const tasks = await this.taskRepository.find({
       relations: { list: true, categories: true },
     });
+    return new HttpResponse(true, `All tasks finded`, tasks);
   }
 
   public findOne(id: number): Promise<Task> {
@@ -41,6 +45,26 @@ export class TaskService {
   update(id: number, updateTaskDto: UpdateTaskDto) {
     console.log(updateTaskDto);
     return `This action updates a #${id} task`;
+  }
+
+  public async setReady(
+    id: number,
+    setReadyTaskDto: SetReadyTaskDto,
+  ): Promise<HttpResponse> {
+    const result = await this.taskRepository.update(
+      { id },
+      { ready: setReadyTaskDto.ready },
+    );
+    if (result.affected !== 1)
+      throw new HttpException(
+        `The Task with id = ${id} was not updated`,
+        HttpStatus.CONFLICT,
+      );
+    return new HttpResponse(
+      true,
+      `Task with id = ${id} updated successfully`,
+      {},
+    );
   }
 
   remove(id: number) {

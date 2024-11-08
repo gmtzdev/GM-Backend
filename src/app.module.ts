@@ -24,10 +24,6 @@ import { Debt } from './finances/debt/entities/debt.entity';
 import { DebtPayment } from './finances/debt-payment/entities/debt-payment.entity';
 
 // Productivity
-import { ListModule } from './productivity/list/list.module';
-import { TaskModule } from './productivity/task/task.module';
-import { CategoryTaskModule } from './productivity/category-task/category-task.module';
-
 import { List } from './productivity/list/entities/list.entity';
 import { Task } from './productivity/task/entities/task.entity';
 import { CategoryTask } from './productivity/category-task/entities/category-task.entity';
@@ -35,6 +31,7 @@ import { CategoryTask } from './productivity/category-task/entities/category-tas
 // API
 // import { GeneralModule } from './api/general/general.module';
 import { FinancesModule } from './finances/finances.module';
+import { ProductivityModule } from './productivity/productivity.module';
 
 import { Contribution } from './finances/contribution/entities/contribution.entity';
 import { ConfigModule } from '@nestjs/config';
@@ -45,7 +42,6 @@ import { PayCreditCard } from './finances/pay-credit-card/entities/pay-credit-ca
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DB_HOST,
@@ -100,9 +96,7 @@ import { PayCreditCard } from './finances/pay-credit-card/entities/pay-credit-ca
     FinancesModule,
 
     // Productivity
-    ListModule,
-    TaskModule,
-    CategoryTaskModule,
+    ProductivityModule,
   ],
   controllers: [AppController],
   providers: [AppService, MoneyService],
