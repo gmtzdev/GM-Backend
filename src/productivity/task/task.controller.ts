@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -44,5 +45,11 @@ export class TaskController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.taskService.remove(+id);
+  }
+
+  @Get('/getTaskListOfFilter/:id')
+  getTaskListOfFilter(@Param('id') id: string, @Query() query) {
+    const { type } = query;
+    return this.taskService.getTaskListOfFilter(+id, type);
   }
 }

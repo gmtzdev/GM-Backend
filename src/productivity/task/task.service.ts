@@ -70,4 +70,36 @@ export class TaskService {
   remove(id: number) {
     return `This action removes a #${id} task`;
   }
+
+  public async getTaskListOfFilter(id: number, type: string) {
+    let result = null;
+    if (type === 'List') {
+      const list = await this.listService.findOne(id);
+      result = await this.taskRepository.find({
+        relations: {
+          list: true,
+        },
+        where: {
+          list: list,
+        },
+      });
+
+      return new HttpResponse(true, `The task of list with id: ${id}`, result);
+    } else {
+      const category = await this.categoryTaskService.findOne(id);
+      this.taskRepository.find({
+        relations: {
+          categories: true,
+        },
+        where: {
+          categories: category,
+        },
+      });
+      return new HttpResponse(
+        true,
+        `The task of category with id: ${id}`,
+        result,
+      );
+    }
+  }
 }
