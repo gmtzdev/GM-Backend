@@ -28,6 +28,31 @@ import { PayCreditCardService } from './pay-credit-card/pay-credit-card.service'
 
 @Injectable()
 export class FinancesService {
+  private getFirstDayOfWeek(date: string) {
+    const currentDate = new Date(`${date} 12:00:00.000`); // Asegúrate de recibir una fecha válida
+    const dayOfWeek = currentDate.getDay(); // 0 (Domingo) - 6 (Sabado)
+    const firstDayOfWeek = new Date(currentDate);
+    // Restar el número de días que han pasado desde el inicio de la semana
+    firstDayOfWeek.setDate(currentDate.getDate() - dayOfWeek);
+    return firstDayOfWeek;
+  }
+  private async getExpensesByDay(date: Date) {
+    const startDate = moment(
+      `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} 00:00:00.000`,
+    ).format('YYYY-MM-DD HH:mm:ss.SSS');
+    const endDate = moment(
+      `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} 23:59:59.999`,
+    ).format('YYYY-MM-DD HH:mm:ss.SSS');
+    const bills = await this.billRepository.findBy({
+      created_at: Between(new Date(startDate), new Date(endDate)),
+    });
+    let amount = 0;
+    for (const bill of bills) {
+      amount += bill.amount;
+    }
+    return this.moneyService.toFixed(amount);
+  }
+
   constructor(
     @InjectRepository(Income, 'finance')
     private incomeRepository: Repository<Income>,
@@ -482,6 +507,38 @@ export class FinancesService {
       true,
       'Returns the amount and the percentage of the credit card limit spent',
       { amount, percentage },
+    );
+  }
+
+  async getExpensesByWeek(dateFormatted: string): Promise<HttpResponse> {
+    const year = dateFormatted.slice(0, 4);
+    const month = dateFormatted.slice(4, 6);
+    const day = dateFormatted.slice(6, 8);
+    const firstDay = this.getFirstDayOfWeek(`${year}-${month}-${day}`);
+    const dayOfWeek = firstDay;
+    const week = [];
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const day = {
+        value: await this.getExpensesByDay(dayOfWeek),
+        itemStyle: {
+          borderRadius: [5, 5, 0, 0],
+        },
+      };
+      week.push(day);
+      days.push({
+        day: dayOfWeek.getDate(),
+        month: dayOfWeek.getMonth() + 1,
+      });
+      dayOfWeek.setDate(dayOfWeek.getDate() + 1);
+    }
+    return new HttpResponse(
+      true,
+      `The expenses for the week were calculated correctly`,
+      {
+        data: week,
+        week: days,
+      },
     );
   }
 }

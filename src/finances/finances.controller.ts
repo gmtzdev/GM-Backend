@@ -5,6 +5,7 @@ import {
   Body,
   Param,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { FinancesService } from './finances.service';
 import { CategoryOptions } from 'src/shared/interfaces/categoryOptions';
@@ -82,5 +83,10 @@ export class FinancesController {
   @Get('getNoCompleteDebts')
   getNoCompleteDebts() {
     return this.debtService.getNoCompleteDebts();
+  }
+
+  @Get('getExpensesByWeek')
+  getExpensesByWeek(@Query('date') date: string) {
+    return this.financesService.getExpensesByWeek(date);
   }
 }
