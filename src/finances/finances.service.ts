@@ -518,13 +518,20 @@ export class FinancesService {
     const dayOfWeek = firstDay;
     const week = [];
     const days = [];
+    let majorIndex = -1;
+    let majorValue = -1;
     for (let i = 0; i < 7; i++) {
       const day = {
         value: await this.getExpensesByDay(dayOfWeek),
         itemStyle: {
           borderRadius: [5, 5, 0, 0],
+          color: '#1ef50d',
         },
       };
+      if (majorValue < day.value) {
+        majorValue = day.value;
+        majorIndex = i;
+      }
       week.push(day);
       days.push({
         day: dayOfWeek.getDate(),
@@ -532,6 +539,7 @@ export class FinancesService {
       });
       dayOfWeek.setDate(dayOfWeek.getDate() + 1);
     }
+    week[majorIndex].itemStyle.color = '#a67c42';
     return new HttpResponse(
       true,
       `The expenses for the week were calculated correctly`,
