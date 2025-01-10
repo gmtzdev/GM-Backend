@@ -539,7 +539,7 @@ export class FinancesService {
       });
       dayOfWeek.setDate(dayOfWeek.getDate() + 1);
     }
-    week[majorIndex].itemStyle.color = '#a67c42';
+    week[majorIndex].itemStyle.color = '#d11616';
     return new HttpResponse(
       true,
       `The expenses for the week were calculated correctly`,
